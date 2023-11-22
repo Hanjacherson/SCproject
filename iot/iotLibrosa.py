@@ -4,7 +4,7 @@ import librosa.display
 import matplotlib.pyplot as plt
 
 # 오디오 파일 로드
-file_path = 'output.wav'  # 대체할 오디오 파일 경로
+file_path = 'output.wav'
 # 오디오 파일의 일부만 로드
 y, sr = librosa.load(file_path, sr=22050, offset=0.0, duration=30.0)  # 처음 30초만 로드
 
@@ -12,7 +12,6 @@ y, sr = librosa.load(file_path, sr=22050, offset=0.0, duration=30.0)  # 처음 3
 S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
 log_S = librosa.power_to_db(S, ref=np.max)
 
-# 멜 스펙트로그램 플롯
 plt.figure()
 librosa.display.specshow(log_S, sr=sr, x_axis='time', y_axis='mel')
 plt.title('Mel Spectrogram')
