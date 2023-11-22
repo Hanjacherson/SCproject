@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # 오디오 파일 로드
 file_path = 'output.wav'
 # 오디오 파일의 일부만 로드
-y, sr = librosa.load(file_path, sr=22050, offset=0.0, duration=30.0)  # 처음 30초만 로드
+y, sr = librosa.load(file_path, sr=22050, offset=0.0, duration=30.0)
 
 # 멜 스펙트로그램 생성
 S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
