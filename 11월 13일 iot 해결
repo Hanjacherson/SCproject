@@ -1,0 +1,120 @@
+rsapberry@raspberrypi:~ $ history
+    1  sudo apt-get update
+    2  sudo apt-get upgrade -y
+    3  sudo apt-get install ibus
+    4  sudo apt-get install ibus-hangul
+    5  sudo apt-get install fonts-unfonts-core
+    6  sudo reboot
+    7  sudo apt-get install nabi
+    8  sudo nano /etc/dhcpcd.conf
+    9  sudo reboot
+   10  ifconfig
+   11  sudo nano /etc/dhcpcd.conf
+   12  python3 --version
+   13  pip3 install librosa
+   14  pip install librosa
+   15  sudo apt-get install pip3
+   16  sudo apt-get install pip
+   17  pip install librosa
+   18  git --version
+   19  pip install flask
+   20  python numpy --version
+   21  python3 numpy --version
+   22  pip install numpy
+   23  pip list
+   24  pip install "librosa>0.6.3"
+   25  sudo pip3 install "librosa>0.6.3"
+   26  sudo apt install python3-xyz
+   27  sudo apt install python-xyz
+   28  sudo apt install xyz
+   29  pip install --upgrade pip
+   30  sudo apt install python3
+   31  sudo apt install python3-librosa
+   32  sudo pip install --upgrade pip
+   33  python3 -m venv myvenv
+   34  source myvenv/bin/activate
+   35  pip install librosa
+   36  pip install wheel
+   37  sudo apt-get install llvm
+   38  pip install librosa
+   39  librosa --version
+   40  pip list
+   41  open python3
+   42  python3
+   43  pip install matplotlib
+   44  ls
+   45  python3 파형분석test.py
+   46  python3
+   47  sudo apt-get install libopenblas-dev
+   48  sudo ldconfig
+   49  python3 파형분석test.py
+   50  history
+   51  exit
+   52  wget
+   53  sudo apt-get remove python3-pip
+   54  wget https://bootstrap.pypa.io/get-pip.py
+   55  python3 get-pip.py
+   56  python3 get-pip.py --break-system-packages
+   57  pip install librosa
+   58  pip3 install librosa
+   59  /home/rsapberry/.local/bin
+   60  sudo nano /home/rsapberry/.local/bin
+   61  sudo /home/rsapberry/.local/bin
+   62  sudo  /home/rsapberry/.local/bin
+   63  sudo pip3 install pip.py
+   64  apt-get install python-pip
+   65  sudo passwd root
+   66  su
+   67  conda pip install --upgrade pip
+   68  pip install --update pip
+   69  pip install update pip
+   70  sudo pip install --upgrade pip
+   71  sudo apt-get install pip
+   72  python3-pip install --upgrade python3-pip
+   73  pip3
+   74  pip
+   75  pip freeze
+   76  pip -V
+   77  pip3 -V
+   78  sudo raspi-config
+   79  sudo pip install --upgrade pip
+   80  activate myvenv
+   81  conda env list
+   82  sudo env list
+   83  source myvenv/bin/activate
+   84  pip install --upgrade pip
+   85  python3
+   86  apt-get install python-pip
+   87  sudo apt-get install python-pip
+   88  sudo apt-get install python3-pip
+   89  pip3 install librosa
+   90  sudo pip3 install librosa
+   91  sudo pip3 install librosa --break--system-packages
+   92  sudo pip3 install librosa --break-system-packages
+   93  sudo apt remove ibus ibus-hangul
+   94  sudo apt install fcitx fcitx-hangul
+   95  history
+   96  sudo nano /etc/default/im-config
+   97  reboot
+   98  im-config -a
+   99  reboot
+  100  source myvenv/bin/activate
+  101  python3 /home/rsapberry/Downloads/파형분석test.py
+  102  python3 소켓.py
+  103  python3 Testrequest-Server.py
+  104  python3 test22.py
+  105  pip install spidev
+  106  python3 test22.py
+  107  python3 test.py
+  108  python3 spidevRead.py
+  109  python3 파형분석test.py
+  110  source myvenv/bin/activate
+  111  python3 iftTest.py
+  112  pip install flask
+  113  python3 iftTest.py
+  114  source myvenv/bin/activate
+  115  pip install mfcc
+  116  pip install nfcc
+  117  어이가　없네
+  118  왜　한글　여기서만　됨？
+  119  history
