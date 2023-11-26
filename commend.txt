@@ -1,0 +1,6 @@
+Git commend
+git add .
+git checkout origin HEAD:sub
+git pull origin origin HEAD:sub
+git commit -m "messege"
+git push origin origin HEAD:sub
