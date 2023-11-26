@@ -64,7 +64,7 @@ def periodic_task(sample_rate, duration, server_url):
 def main():
     sample_rate = 44100  # 샘플링 레이트
     duration = 5         # 녹음 시간
-    server_url = 'http://192.168.21.152:5021/data'  # 업로드 할 서버
+    server_url = 'http://192.168.0.12:5080/data'  # 업로드 할 서버
 
     thread = threading.Thread(target=periodic_task, args=(sample_rate, duration, server_url))
     thread.daemon = True
