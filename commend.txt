@@ -4,3 +4,6 @@ git checkout origin HEAD:sub
 git pull origin origin HEAD:sub
 git commit -m "messege"
 git push origin origin HEAD:sub
+
+iot bash commend
+source project/bin/activate
