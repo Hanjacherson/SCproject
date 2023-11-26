@@ -18,8 +18,8 @@ def send_file_to_spring(filename):
 
 @app.before_first_request
 def activate_job(filename):
-    thread = threading.Thread(target=send_file_to_spring(filename))
-    thread.daemon = True  # 주 스레드가 종료될 때 백그라운드 스레드도 종료되도록 설정
+    thread = threading.Thread(target=send_file_to_spring, args=(filename,))
+    thread.daemon = True
     thread.start()
 
 @app.route('/')
