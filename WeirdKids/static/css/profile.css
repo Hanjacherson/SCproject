@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #e5e5e5;
+    width: 100%;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.panel {
+    width: 100%;
+    max-width: 90%;
+    background: url('https://gongu.copyright.or.kr/gongu/wrt/cmmn/wrtFileImageView.do?wrtSn=11289097&filePath=L2Rpc2sxL25ld2RhdGEvMjAxNS8wMi9DTFM2OS9OVVJJXzAwMV8wNTgzX251cmltZWRpYV8yMDE1MTIwMw==&thumbAt=Y&thumbSe=b_tbumb&wrtTy=100067') #fff;
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: cover;
+    margin-top: 5%;
+    height: auto;
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    background: #FFF;
+    margin: 10px;
+    min-width: 300px;
+    max-width: 600px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 20px 15px -15px rgba(119, 119, 119, 0.85);
+}
+
+h1 {
+    color: #000000;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 4px;
+    margin: 50px 0;
+    font-size: 1.7em;
+}
+
+.member-info,
+.my-pet-info {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+
+h2 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+form {
+    padding: 50px;
+}
+
+label {
+    display: block;
+    margin: 15px 0 5px;
+    color: #000000;
+    font-weight: 600;
+    text-align: left;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+select {
+    width: calc(33.3% - 10px);
+}
+
+button {
+    width: 48%;
+    padding: 10px;
+    background: #FdF4EA;
+    border: none;
+    color: #000000;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+button:active {
+    background: #FdF4EA;
+    color: #000000;
+}
+
+
+
+

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <title>마이페이지</title>
+</head>
+
+<body>
+    <h1>회원정보</h1>
+
+    <div class="block" id="member-info">
+        <h2>안녕하세요 {{ nickname }}님</h2>
+        <form action="/update_profile" method="post" id="profile-form">
+            <!-- ID는 읽기 전용으로 표시 -->
+            <p><strong>ID:</strong> {{ user_id }}</p>
+
+            <!-- 로그인할 때 사용된 비밀번호 입력란 -->
+            <label for="current_password">현재 비밀번호:</label>
+            <input type="password" id="current_password" name="current_password" placeholder="현재 비밀번호 입력">
+            
+            <!-- PW를 변경할 수 있는 입력 필드 추가 -->
+            <label for="password">새로운 비밀번호:</label>
+            <input type="password" id="password" name="password" placeholder="새로운 비밀번호 입력">
+
+            <!-- 기존 정보를 지우고 새로운 정보 입력 가능 -->
+            <label for="email">새로운 이메일:</label>
+            <input type="email" id="email" name="email" placeholder="새로운 이메일 입력" value="{{ email }}">
+
+            <label for="nickname">새로운 닉네임:</label>
+            <input type="text" id="nickname" name="nickname" placeholder="새로운 닉네임 입력" value="{{ nickname }}">
+
+            <label for="phone">새로운 전화번호:</label>
+            <input type="tel" id="phone" name="phone" placeholder="새로운 전화번호 입력" value="{{ phone }}">
+
+            <input type="hidden" name="profile_submit_type" value="회원정보 수정">
+            <input type="hidden" name="pet_name" value="">
+            <button type="button" id="profile-update-button">회원정보 수정</button>
+        </form>
+    </div>
+
+    <div class="block" id="my-pet-info">
+        <h2>My Pet</h2>
+    
+        <form action="/update_pet_info" method="post" id="pet-form">
+            {% if pet_info %}
+                <label for="pet_name">강아지 이름:</label>
+                <input type="text" id="existing_pet_name" name="pet_name" placeholder="강아지 이름 입력" value="{{ pet_info['pet_name'] }}" readonly>
+    
+                <label for="pet_birth_date">태어난 날짜:</label>
+                <select id="existing_pet_birth_year" name="pet_birth_year" required>
+                    {% for year in range(1990, 2023) %}
+                        <option value="{{ year }}" {% if year == pet_info['created_at'].year %} selected {% endif %}>{{ year }}년</option>
+                    {% endfor %}
+                </select>
+                <select id="existing_pet_birth_month" name="pet_birth_month" required>
+                    {% for month in range(1, 13) %}
+                        <option value="{{ month }}" {% if month == pet_info['created_at'].month %} selected {% endif %}>{{ month }}월</option>
+                    {% endfor %}
+                </select>
+                <select id="existing_pet_birth_day" name="pet_birth_day" required>
+                    {% for day in range(1, 32) %}
+                        <option value="{{ day }}" {% if day == pet_info['created_at'].day %} selected {% endif %}>{{ day }}일</option>
+                    {% endfor %}
+                </select>
+    
+                <button type="button" id="existing-pet-update-button" style="display: block;">강아지 정보 수정</button>
+            {% else %}
+                <label for="pet_name">강아지 이름:</label>
+                <input type="text" id="new_pet_name" name="pet_name" placeholder="강아지 이름 입력">
+    
+                <label for="pet_birth_date">태어난 날짜:</label>
+                <select id="new_pet_birth_year" name="pet_birth_year" required>
+                    {% for year in range(1990, 2023) %}
+                        <option value="{{ year }}">{{ year }}년</option>
+                    {% endfor %}
+                </select>
+                <select id="new_pet_birth_month" name="pet_birth_month" required>
+                    {% for month in range(1, 13) %}
+                        <option value="{{ month }}">{{ month }}월</option>
+                    {% endfor %}
+                </select>
+                <select id="new_pet_birth_day" name="pet_birth_day" required>
+                    {% for day in range(1, 32) %}
+                        <option value="{{ day }}">{{ day }}일</option>
+                    {% endfor %}
+                </select>
+    
+                <input type="hidden" name="pet_name" value="">
+                <button type="button" id="new-pet-register-button" style="display: block;">강아지 등록</button>
+            {% endif %}
+        </form>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+    
+
+</body>
+
+</html>
+
+
+
+
+
