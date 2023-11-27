@@ -31,13 +31,16 @@ def collect_audio_data(duration, sample_rate):
 # 오디오 데이터 전처리 및 모델 처리 함수
 def process_audio_data(audio_data, sample_rate):
     # 여긴 실제 전처리 하는곳 "해줘"
-    S = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate, n_mels=128)
-    log_S = librosa.power_to_db(S, ref=np.max)
-    tempo, _ = librosa.beat.beat_track(audio_data, sr=sample_rate)
+    try:
+        S = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate, n_mels=128)
+        log_S = librosa.power_to_db(S, ref=np.max)
+        tempo, _ = librosa.beat.beat_track(audio_data, sr=sample_rate)
 
-    model_result = process_with_model(log_S, tempo)
+        model_result = process_with_model(log_S, tempo)
 
-    return model_result
+        return model_result
+    except:
+        return 0
 
 # 모델 처리 함수
 def process_with_model(spectrogram, tempo):
@@ -64,7 +67,7 @@ def periodic_task(sample_rate, duration, server_url):
 def main():
     sample_rate = 44100  # 샘플링 레이트
     duration = 5         # 녹음 시간
-    server_url = 'http://192.168.0.12:5080/data'  # 업로드 할 서버
+    server_url = 'http://192.168.0.24:5080/data'  # 업로드 할 서버
 
     thread = threading.Thread(target=periodic_task, args=(sample_rate, duration, server_url))
     thread.daemon = True
