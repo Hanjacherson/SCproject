@@ -61,7 +61,6 @@ def process_audio_data(audio_data, sample_rate):
     interpreter.allocate_tensors()
 
     # 오디오 데이터 전처리 (여기서는 추가 전처리가 필요한 경우 추가)
-    # 예: 멜 스펙트로그램 변환, 길이 조정 등
 
     # 입력 텐서 설정 및 모델 실행
     input_details = interpreter.get_input_details()
