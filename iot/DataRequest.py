@@ -4,6 +4,8 @@ import requests
 import threading
 import time
 import spidev
+import tflite_runtime.interpreter as tflite
+import wave
 
 # spidev 설정 및 아날로그 읽기 함수
 spi = spidev.SpiDev()
@@ -16,7 +18,7 @@ def analog_read(portChannel):
     return data
 
 # 오디오 데이터 수집 및 변환 함수
-def collect_audio_data(duration, sample_rate):
+def collect_audio_data(duration, sample_rate, output_file_path='output.wav'):
     num_samples = duration * sample_rate
     audio_data = []
 
@@ -26,26 +28,48 @@ def collect_audio_data(duration, sample_rate):
         audio_data.append(scaled_data)
         time.sleep(1.0 / sample_rate)
     
-    return np.array(audio_data, dtype=np.int16)
+    audio_array = np.array(audio_data, dtype=np.int16)
 
-# 오디오 데이터 전처리 및 모델 처리 함수
+    # wave 파일 저장 설정
+    output_file = wave.open(output_file_path, 'w')
+    output_file.setnchannels(1)  # 모노
+    output_file.setsampwidth(2)  # 샘플당 2바이트 (16비트)
+    output_file.setframerate(sample_rate)
+    output_file.writeframes(audio_array.tobytes())
+    output_file.close()
+
+    return audio_array
+
 def process_audio_data(audio_data, sample_rate):
-    # 여긴 실제 전처리 하는곳 "해줘"
-    try:
-        S = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate, n_mels=128)
-        log_S = librosa.power_to_db(S, ref=np.max)
-        tempo, _ = librosa.beat.beat_track(audio_data, sr=sample_rate)
+    # TensorFlow Lite 모델 로드 및 텐서 할당
+    interpreter = tflite.Interpreter(model_path="/home/pi/Desktop/TEST/model.tflite")
+    interpreter.allocate_tensors()
+    
+    # 오디오 데이터를 부동소수점 형태로 변환 및 전처리
+    audio = audio_data.astype(np.float32) / np.iinfo(audio_data.dtype).max
+    sr=sample_rate
 
-        model_result = process_with_model(log_S, tempo)
+    # 2차원 배열로 변환
+    test = np.expand_dims(audio, axis=0)
+    test = np.expand_dims(test, axis=-1)
 
-        return model_result
-    except:
-        return 0
+    # 입력 텐서 설정 및 모델 실행
+    input_details = interpreter.get_input_details()
+    interpreter.set_tensor(input_details[0]['index'], test)
+    interpreter.invoke()
+
+    # 결과 얻기
+    output_details = interpreter.get_output_details()
+    model_result = interpreter.get_tensor(output_details[0]['index'])
+
+    print(model_result)
+    return model_result
+
 
 # 모델 처리 함수
-def process_with_model(spectrogram, tempo):
+#def process_with_model(spectrogram, tempo):
     # model을 달라
-    return {"processed_data": spectrogram, "tempo": tempo}
+#    return {"processed_data": spectrogram, "tempo": tempo}
 
 # 결과를 JSON 형식으로 전송하는 함수
 def send_json_to_server(url, data):
@@ -65,9 +89,9 @@ def periodic_task(sample_rate, duration, server_url):
 
 # 멀티스레딩을 이용한 주기적 작업 실행
 def main():
-    sample_rate = 44100  # 샘플링 레이트
-    duration = 5         # 녹음 시간
-    server_url = 'http://192.168.0.24:5080/data'  # 업로드 할 서버
+    sample_rate = 22050  # 샘플링 레이트
+    duration = 4         # 녹음 시간
+    server_url = 'http://192.168.20.99:5080/data'  # 업로드 할 서버
 
     thread = threading.Thread(target=periodic_task, args=(sample_rate, duration, server_url))
     thread.daemon = True
@@ -80,4 +104,3 @@ def main():
 # 스크립트가 직접 실행될 때만 main 함수 호출
 if __name__ == "__main__":
     main()
-
