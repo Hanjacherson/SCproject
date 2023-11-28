@@ -62,14 +62,7 @@ def process_audio_data(audio_data, sample_rate):
     output_details = interpreter.get_output_details()
     model_result = interpreter.get_tensor(output_details[0]['index'])
 
-    print(model_result)
     return model_result
-
-
-# 모델 처리 함수
-#def process_with_model(spectrogram, tempo):
-    # model을 달라
-#    return {"processed_data": spectrogram, "tempo": tempo}
 
 # 결과를 JSON 형식으로 전송하는 함수
 def send_json_to_server(url, data):
@@ -91,7 +84,7 @@ def periodic_task(sample_rate, duration, server_url):
 def main():
     sample_rate = 22050  # 샘플링 레이트
     duration = 4         # 녹음 시간
-    server_url = 'http://192.168.20.99:5080/data'  # 업로드 할 서버
+    server_url = 'http://192.168.20.99:5000/data'  # 업로드 할 서버
 
     thread = threading.Thread(target=periodic_task, args=(sample_rate, duration, server_url))
     thread.daemon = True
