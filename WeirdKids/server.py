@@ -306,6 +306,48 @@ def send_notification():
     except requests.exceptions.RequestException as err:
         logger.error(f"요청 예외: {err}")
 
+cursor = mysql.cursor()
+@app.route("/")
+def index():
+    # 예제 쿼리: pet_idx가 1이고 voice_result가 'A' 또는 'B'인 데이터 가져오기
+    query = "SELECT * FROM t_voice WHERE pet_idx = 1 AND voice_result IN ('A', 'B')"
+    cursor.execute(query)
+    result = cursor.fetchone()
+
+    if result:
+        # 예제 쿼리: voice_result 값에 따라 voice_data 업데이트
+        update_query = """
+        UPDATE t_voice
+        SET 
+            voice_data = CASE 
+                            WHEN voice_result = 'A' THEN '정임이 천재' 
+                            WHEN voice_result = 'B' THEN '정임이 바보' 
+                        END,
+            result_at = CONVERT_TZ(NOW(), 'UTC', 'Asia/Seoul')
+        WHERE voice_idx = %s
+        """
+        cursor.execute(update_query, (result[0],))  # result[0]은 voice_idx
+
+        # 업데이트된 데이터를 HTML 파일에 전달
+        return render_template("home.html", voice_data=result[2])
+    else:
+        return "No data found."
+cursor = mysql.cursor()
+
+@app.route("/")
+def index():
+    # MySQL 쿼리 실행
+    query = """
+    SELECT DATE(result_at) AS date, COUNT(*) AS count
+    FROM t_voice
+    GROUP BY DATE(result_at)
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+
+    # 결과를 JSON 형식으로 반환
+    return jsonify(results)
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
 
