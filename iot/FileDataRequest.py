@@ -78,12 +78,12 @@ def process_audio_data(audio_data, sample_rate):
     # 결과 얻기
     model_result = interpreter.get_tensor(output_details[0]['index'])
 
-    return model_result.tolist()
+    return model_result.tolist()[0][0]
 
 def send_json_to_server(url, data):
     try:
-        jdata = json.dumps(data)
-        response = requests.post(url, json=jdata)
+        jdata = json.dumps({"value":data})
+        response = requests.post(url, data=jdata, headers={'Content-Type' : 'application/json'})
         print(f"JSON sent to {url}. Response status code: {response.status_code}")
     except Exception as e:
         print(f"An error occurred: {e}")

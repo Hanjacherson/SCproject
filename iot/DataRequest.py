@@ -67,7 +67,8 @@ def process_audio_data(audio_data, sample_rate):
 # 결과를 JSON 형식으로 전송하는 함수
 def send_json_to_server(url, data):
     try:
-        response = requests.post(url, json=data)
+        jdata = json.dumps({"value":data})
+        response = requests.post(url, data=jdata, headers={'Content-Type' : 'application/json'})
         print(f"JSON sent to {url}. Response status code: {response.status_code}")
     except Exception as e:
         print(f"An error occurred: {e}")
