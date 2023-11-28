@@ -283,20 +283,20 @@ def termsofuse():
 
 @app.route('/data', methods=['GET','POST'])
 def receive_data():
-    data = request.json
-    # data = request.get_json() post
-    print("Received data:", data)
-    
+    #data = request.json
+    data = request.get_json()
+    if data is None:
+        data = json.loads(request.data.decode('utf-8'))
     # 값이 2 이상인 경우에만 IFTTT로 알림 보내기
-    if 'value' in data and data['value'] == 1:
+    if isinstance(data, dict) and 'value' in data and data['value'] > 0:
         send_notification()
-        return 'Notification sent'
+        return {'success':'Notification sent'}
     else:
-        return 'Value is less than 2, no notification sent'
+        return {'fail':'Notification no sent'}
 
 def send_notification():
     # IFTTT로 POST 요청 보내기
-    data1 = {'값1': '노드조1'}
+    data1 = {'value': '노드조'}
     try:
         response = requests.post(ifttt_webhook_url, json=data1)
         response.raise_for_status()  # 나쁜 응답에 대해 HTTPError 발생
