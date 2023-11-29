@@ -289,8 +289,32 @@ def receive_data():
         data = json.loads(request.data.decode('utf-8'))
     # 값이 2 이상인 경우에만 IFTTT로 알림 보내기
     if isinstance(data, dict) and 'value' in data and data['value'] > 0:
-        send_notification()
-        return {'success':'Notification sent'}
+        try:
+            # 데이터베이스에 연결
+            connection = pymysql.connect(host="project-db-stu3.smhrd.com", 
+                                        db="Insa4_IOTB_final_4", 
+                                        user="Insa4_IOTB_final_4", 
+                                        password="aischool4", 
+                                        port=3307,
+                                        cursorclass=pymysql.cursors.DictCursor)
+            with connection:
+                with connection.cursor() as cursor:
+                    # SQL 업데이트 쿼리
+                    query = "UPDATE t_voice SET voice_result = %s WHERE voice_idx = %s"
+                    
+                    # SQL 명령 실행
+                    cursor.execute(query, (data['value'], data['voice_idx']))
+                    
+                    # 변경 사항 커밋
+                    connection.commit()
+                    
+                # 연결 종료
+                connection.close()
+
+            send_notification()
+            return {'success':'Notification sent'}
+        except Exception as e:
+                return {'fail': f'오류: {e}'}
     else:
         return {'fail':'Notification no sent'}
 
