@@ -303,7 +303,7 @@ def receive_data():
                     query = "UPDATE t_voice SET voice_result = 1 WHERE voice_idx = %s"
                     
                     # SQL 명령 실행
-                    cursor.execute(query, (data['value'], data['voice_idx']))
+                    cursor.execute(query, (data['voice_idx']))
                     
                     # 변경 사항 커밋
                     connection.commit()
