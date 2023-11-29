@@ -104,7 +104,7 @@ def process_audio_data(audio_data, sample_rate):
     
     return model_result.tolist()[0][0]
 
-def send_json_to_server(url, data, wav_file):
+def send_json_to_server(url, data, wav_file, inf_idx):
     try:
         voice_idx = DQL("select voice_idx from t_voice where pet_idx = %s and voice_data = %s",(inf_idx, wav_file))
         jdata = json.dumps({"voice_idx":voice_idx,"value":data})
@@ -118,20 +118,22 @@ def periodic_task(duration, wav_file_path, sample_rate, server_url):
         if not os.path.exists(file_path):
             with open(file_path, 'w') as file:
                 file.write(DQL("select count(*) from t_pet"))
-        
+                print("Make File")
         with open(file_path, 'r') as file:
             inf_idx = file.read()
-
+        print("Read File")
+        
         # 파일 생성
         wav_file = collect_audio_data(duration, sample_rate, wav_file_path, inf_idx)
-
+        print("Make wav File")
         # 파일 로드
         audio_data, sr = load_audio_data(wav_file, sample_rate)
-
+        print("Read wav File")
         # 오디오 데이터가 유효한 경우에만 처리
         if audio_data is not None:
             result = process_audio_data(audio_data, sr)
-            send_json_to_server(server_url, result, wav_file)
+            print("process_audio_data pass")
+            send_json_to_server(server_url, result, wav_file, inf_idx)
 
         time.sleep(60)  # 60초 간격으로 반복
 
@@ -139,7 +141,7 @@ def main():
     wav_file_path = 'Sound.wav'  # .wav 파일 경로
     sample_rate = 22050  # 샘플링 레이트
     duration = 4 # 재생 시간
-    server_url = 'http://192.168.20.99:5000/data'  # 업로드할 서버 URL
+    server_url = 'http://192.168.0.12:5000/data'  # 업로드할 서버 URL
 
     thread = threading.Thread(target=periodic_task, args=(duration, wav_file_path, sample_rate, server_url))
     thread.daemon = True
