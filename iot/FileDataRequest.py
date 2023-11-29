@@ -8,22 +8,22 @@ import spidev
 import tflite_runtime.interpreter as tflite
 import wave
 import json
-import pymysql
-import pickle
+import pymysql as ps
 
-mysql = pymysql.connect(host="project-db-stu3.smhrd.com", 
+mysql = ps.connect(host="project-db-stu3.smhrd.com", 
                        db="Insa4_IOTB_final_4", 
                        user="Insa4_IOTB_final_4", 
                        password="aischool4", 
                        port=3307,
-                       cursorclass=pymysql.cursors.DictCursor)
+                       cursorclass=ps.cursors.DictCursor)
+
 # spidev 설정 및 아날로그 읽기 함수
 spi = spidev.SpiDev()
 spi.open(0,0)
 spi.max_speed_hz = 1000000
 
+file_path = 'data.txt'
 file_counter = 0  # 파일 이름에 사용될 카운터
-file_path = 'data.inf'
 
 def DQL(sql, params=None):
     cursor = mysql.cursor()
@@ -39,20 +39,13 @@ def DML(sql, params=None):
     cursor.close()
     return "success!!"
 
-if not os.path.exists(file_path):
-    with open(file_path, 'wb') as file:
-        pickle.dump({"data":DQL("select count(*) from t_pet")}, file)
-
-with open(file_path, 'rb') as file:
-    inf_idx = pickle.load(file)
-
 def analog_read(portChannel):
     adc = spi.xfer2([1, (8+portChannel)<<4, 0])
     data = ((adc[1]&3)<<8)+adc[2]
     return data
 
 # 오디오 데이터 수집 및 .wav 파일 저장 함수
-def collect_audio_data(duration, sample_rate, base_file_path):
+def collect_audio_data(duration, sample_rate, base_file_path, inf_idx):
     global file_counter
     file_counter += 1
     output_file_path = f"{base_file_path}_{file_counter}.wav"
@@ -73,7 +66,8 @@ def collect_audio_data(duration, sample_rate, base_file_path):
         output_file.setsampwidth(2)
         output_file.setframerate(sample_rate)
         output_file.writeframes(audio_array.tobytes())
-
+    
+    DML("insert into t_voice(pet_idx, voice_data) values(%s, %s)",(inf_idx,output_file_path))
     return output_file_path
 
 # .wav 파일에서 오디오 데이터 로드 함수
@@ -107,12 +101,13 @@ def process_audio_data(audio_data, sample_rate):
 
     # 결과 얻기
     model_result = interpreter.get_tensor(output_details[0]['index'])
-
+    
     return model_result.tolist()[0][0]
 
-def send_json_to_server(url, data):
+def send_json_to_server(url, data, wav_file):
     try:
-        jdata = json.dumps({"value":data})
+        voice_idx = DQL("select voice_idx from t_voice where pet_idx = %s and voice_data = %s",(inf_idx, wav_file))
+        jdata = json.dumps({"voice_idx":voice_idx,"value":data})
         response = requests.post(url, data=jdata, headers={'Content-Type' : 'application/json'})
         print(f"JSON sent to {url}. Response status code: {response.status_code}")
     except Exception as e:
@@ -120,8 +115,15 @@ def send_json_to_server(url, data):
 
 def periodic_task(duration, wav_file_path, sample_rate, server_url):
     while True:
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as file:
+                file.write(DQL("select count(*) from t_pet"))
+        
+        with open(file_path, 'r') as file:
+            inf_idx = file.read()
+
         # 파일 생성
-        wav_file = collect_audio_data(duration, sample_rate, wav_file_path)
+        wav_file = collect_audio_data(duration, sample_rate, wav_file_path, inf_idx)
 
         # 파일 로드
         audio_data, sr = load_audio_data(wav_file, sample_rate)
@@ -129,7 +131,7 @@ def periodic_task(duration, wav_file_path, sample_rate, server_url):
         # 오디오 데이터가 유효한 경우에만 처리
         if audio_data is not None:
             result = process_audio_data(audio_data, sr)
-            send_json_to_server(server_url, result)
+            send_json_to_server(server_url, result, wav_file)
 
         time.sleep(60)  # 60초 간격으로 반복
 
