@@ -8,13 +8,43 @@ import spidev
 import tflite_runtime.interpreter as tflite
 import wave
 import json
+import pymysql
+import pickle
 
+mysql = pymysql.connect(host="project-db-stu3.smhrd.com", 
+                       db="Insa4_IOTB_final_4", 
+                       user="Insa4_IOTB_final_4", 
+                       password="aischool4", 
+                       port=3307,
+                       cursorclass=pymysql.cursors.DictCursor)
 # spidev 설정 및 아날로그 읽기 함수
 spi = spidev.SpiDev()
 spi.open(0,0)
 spi.max_speed_hz = 1000000
 
 file_counter = 0  # 파일 이름에 사용될 카운터
+file_path = 'data.inf'
+
+def DQL(sql, params=None):
+    cursor = mysql.cursor()
+    cursor.execute(sql, params)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+def DML(sql, params=None):
+    cursor = mysql.cursor()
+    cursor.execute(sql, params)
+    mysql.commit()
+    cursor.close()
+    return "success!!"
+
+if not os.path.exists(file_path):
+    with open(file_path, 'wb') as file:
+        pickle.dump({"data":DQL("select count(*) from t_pet")}, file)
+
+with open(file_path, 'rb') as file:
+    inf_idx = pickle.load(file)
 
 def analog_read(portChannel):
     adc = spi.xfer2([1, (8+portChannel)<<4, 0])
