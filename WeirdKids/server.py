@@ -300,7 +300,7 @@ def receive_data():
             with connection:
                 with connection.cursor() as cursor:
                     # SQL 업데이트 쿼리
-                    query = "UPDATE t_voice SET voice_result = %s WHERE voice_idx = %s"
+                    query = "UPDATE t_voice SET voice_result = 1 WHERE voice_idx = %s"
                     
                     # SQL 명령 실행
                     cursor.execute(query, (data['value'], data['voice_idx']))
