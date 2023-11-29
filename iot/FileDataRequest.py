@@ -104,7 +104,7 @@ def periodic_task(duration, wav_file_path, sample_rate, server_url):
         time.sleep(60)  # 60초 간격으로 반복
 
 def main():
-    wav_file_path = 'wavfile.wav'  # .wav 파일 경로
+    wav_file_path = 'Sound.wav'  # .wav 파일 경로
     sample_rate = 22050  # 샘플링 레이트
     duration = 4 # 재생 시간
     server_url = 'http://192.168.20.99:5000/data'  # 업로드할 서버 URL
