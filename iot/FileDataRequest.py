@@ -30,7 +30,6 @@ os.environ['DB_NAME'] = 'Insa4_IOTB_final_4'
 os.environ['DB_USER'] = 'Insa4_IOTB_final_4'
 os.environ['DB_PASSWORD'] = 'aischool4'
 os.environ['DB_PORT'] = '3307'
-os.environ['SERVER_URL'] = 'http://192.168.20.99:5000/data'
 
 # 이후 코드에서 환경 변수 사용
 db_host = os.environ.get('DB_HOST')
@@ -38,7 +37,6 @@ db_name = os.environ.get('DB_NAME')
 db_user = os.environ.get('DB_USER')
 db_password = os.environ.get('DB_PASSWORD')
 db_port = int(os.environ.get('DB_PORT'))
-server_url = os.environ.get('SERVER_URL')
 
 # 데이터베이스 연결
 mysql = ps.connect(host=db_host, db=db_name, user=db_user, password=db_password, port=db_port)
@@ -63,6 +61,9 @@ def DML(sql, params=None):
     mysql.commit()
     cursor.close()
     return "success!!"
+
+os.environ['SERVER_URL'] = 'http://'+str(DQL("select ip_val from t_ip where ad_idx=%s",1)[0][0])+':5000/data'
+server_url = os.environ.get('SERVER_URL')
 
 def analog_read(portChannel):
     adc = spi.xfer2([1, (8+portChannel)<<4, 0])
