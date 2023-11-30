@@ -1,0 +1,199 @@
+/* profile.css */
+
+body {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #e5e5e5;
+}
+
+h1,
+a,
+.block {
+    text-align: center;
+}
+
+a {
+    display: block; /* 가운데 정렬을 위해 블록 요소로 변환 */
+    margin-top: 20px; /* 위쪽 마진 추가 */
+}
+
+.block {
+    background-color: #FFF;
+    border-radius: 20px;
+    box-shadow: 0 20px 15px -15px rgba(119, 119, 119, 0.85);
+    margin: 10px auto;
+    min-width: 300px;
+    max-width: 400px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding-bottom: 30px;
+}
+
+#pet-image {
+    border: 1px solid #ccc; /* 테두리 스타일 및 색상을 원하는 대로 조정 */
+    padding: 8px; /* 테두리와 내용 사이의 간격을 조정 */
+    border-radius: 5px; /* 테두리의 모서리를 둥글게 만듭니다. */
+}
+
+#member-info {
+    text-align: center;
+}
+
+#member-info h2 {
+    color: #686868;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-top: 10px;
+}
+
+form input {
+    padding: 10px;
+    margin-bottom: 15px;
+    text-align: center; /* 텍스트를 수평으로 가운데로 정렬 */
+}
+
+label[for="dog-name"],
+label[for="year"],
+label[for="month"],
+label[for="day"] {
+    font-size: 13px; /* 필요한 크기로 조정 */
+}
+
+#current_password,
+#password,
+#email,
+#nickname,
+#phone{
+    padding: 12px; /* 더 큰 패딩으로 조절 */
+    margin-bottom: 15px;
+    width: 100%; /* 가로 크기 100% 유지 */
+}
+
+#dog-name{
+    width: 100%; /* 가로 크기 조절 */
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+#year,
+#month,
+#day {
+    width: 25%; /* 가로 크기 조절 */
+    margin-right: 5px;  
+}
+
+#upload-form input[type="submit"] {
+    display: none;
+}
+
+/* 모바일 화면에서는 세로로 정렬 */
+@media (max-width: 767px) {
+    #birthdate-section {
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+    }
+
+    #dog-name,
+    #year,
+    #month,
+    #day {
+        width: 100%;
+        margin-bottom: 10px;
+        box-sizing: border-box; /* 패딩과 테두리를 너비에 포함합니다. */
+    }
+
+    #dog-name {
+        padding: 10px 5px 10px 8px; 
+        margin: 0px;
+        width: calc(100% - 8px);
+    }
+
+    #year,
+    #month,
+    #day {
+        padding: 10px 5px 10px 8px; 
+        margin: 0px 5px 10px;
+    }
+}
+
+
+
+.block form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 세로 정렬을 위한 추가 스타일 */
+}
+
+form button {
+    padding: 10px;
+    background-color: #333;
+    color: #FFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#my-pet-info {
+    text-align: center;
+}
+
+#my-pet-info h2 {
+    color: #686868;
+}
+
+
+
+#image-upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#upload-form {
+    display: flex;
+    align-items: center;
+}
+
+
+#name-section,
+#birthdate-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+#name-section input,
+#birthdate-section input {
+    flex-grow: 0.5; /* flex-grow 속성 조절 (필요에 따라 조절) */
+    margin-left: 5px;
+}
+
+@media (max-width: 767px) {
+    form input {
+        width: 100%;
+    }
+
+    #name-section,
+    #birthdate-section {
+        flex-direction: column;
+    }
+}
+
+

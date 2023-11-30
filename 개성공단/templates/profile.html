@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <title>마이페이지</title>
+</head>
+
+<body>
+    <h1>마이페이지</h1>
+
+    <!-- 홈 버튼 추가 -->
+    <a href="{{ url_for('home') }}">홈으로 이동</a>
+
+
+    <div class="block" id="member-info">
+        <h2>안녕하세요 {{ nickname }}님</h2>
+        <form action="/update_profile" method="post" id="profile-form">
+            <!-- ID는 읽기 전용으로 표시 -->
+            <p><strong>아이디:</strong> {{ user_id }}</p>
+
+            <!-- 로그인할 때 사용된 비밀번호 입력란 -->
+            <label for="current_password">현재 비밀번호</label>
+            <input type="password" id="current_password" name="current_password" placeholder="현재 비밀번호 입력">
+
+            <!-- PW를 변경할 수 있는 입력 필드 추가 -->
+            <label for="password">새로운 비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="새로운 비밀번호 입력">
+
+            <!-- 기존 정보를 지우고 새로운 정보 입력 가능 -->
+            <label for="email">새로운 이메일</label>
+            <input type="email" id="email" name="email" placeholder="새로운 이메일 입력" value="{{ email }}">
+
+            <label for="nickname">새로운 닉네임</label>
+            <input type="text" id="nickname" name="nickname" placeholder="새로운 닉네임 입력" value="{{ nickname }}">
+
+            <label for="phone">새로운 전화번호</label>
+            <input type="tel" id="phone" name="phone" placeholder="새로운 전화번호 입력" value="{{ phone }}">
+
+            <input type="hidden" name="profile_submit_type" value="회원정보 수정">
+            <input type="hidden" name="pet_name" value="">
+            <button type="submit" id="profile-update-button">회원정보 수정</button>
+
+        </form>
+    </div>
+
+    <style>
+        .dropdown-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-container select {
+            margin-right: 10px; /* 각 드롭다운 간격 조절을 위한 마진 설정 */
+        }
+    </style>
+
+    <div class="block" id="my-pet-info">
+        <h2>My Pet</h2>
+
+            <!-- 이미지 파일 업로드를 위한 input 필드 -->
+            <div id="image-upload-section">
+                <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+                    <label for="pet-image" id="file-label">반려견 이미지 업로드</label>
+                    <input type="file" id="pet-image" name="pet_image" accept="image/*" onchange="displayFileName(this)">
+                    <input type="submit" value="업로드">
+                </form>
+            </div>
+
+            <form method="post" action="{{ url_for('profile') }}">
+                <!-- 강아지 이름 입력 칸 -->
+                <div id="name-section">
+                    <label for="dog-name">강아지 이름:</label>
+                    <input type="text" id="dog-name" name="dog_name" placeholder="반려견 이름을 알려주세요" value="{% if pet_info %}{{ pet_info.pet_name }}{% endif %}">
+                </div>
+
+                <!-- 생년월일 입력 칸 -->
+                <div id="birthdate-section" >
+                    <label for="year">년</label>
+                    <input type="text" id="year" name="year" placeholder="1990형식" value="{% if pet_info and pet_info.created_at %}{{ pet_info.created_at.year }}{% endif %}">
+
+                    <label for="month">월</label>
+                    <input type="text" id="month" name="month" placeholder="01~12" value="{% if pet_info and pet_info.created_at %}{{ pet_info.created_at.month }}{% endif %}">
+
+                    <label for="day">일</label>
+                    <input type="text" id="day" name="day" placeholder="01~31" value="{% if pet_info and pet_info.created_at %}{{ pet_info.created_at.day }}{% endif %}">
+                </div>
+
+                
+                <!-- 등록 버튼 -->
+                <button type="submit">등록/수정</button>
+
+                 <!-- 반려동물 정보 출력 부분 추가 -->
+                {% if pet_info %}
+                <div class="pet-info">
+                    <p><strong>반려동물 이름:</strong> {{ pet_info.pet_name }}</p>
+                    <p><strong>생년월일:</strong> {{ created_at }}</p>
+                </div>
+                {% else %}
+                <div class="pet-info">
+                    <p><strong>반려동물 정보가 없습니다. <br>등록을 진행해주세요.</strong></p>
+                </div>
+                {% endif %}
+
+                <script>
+                    $(document).ready(function() {
+                        {% if 'update_success_message' in session %}
+                            alert("등록/수정 성공");
+                            // 메시지를 봤으면 세션을 비워줍니다.
+                            {% set _ = session.pop('update_success_message', None) %}
+                        {% elif 'update_failure_message' in session %}
+                            alert("등록/수정 실패");
+                            // 메시지를 봤으면 세션을 비워줍니다.
+                            {% set _ = session.pop('update_failure_message', None) %}
+                        {% endif %}
+                    });
+                </script>
+                
+            </form>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+
+    <script>
+        function displayFileName(input) {
+            var fileName = input.files.length > 0 ? input.files[0].name : "파일을 선택하세요";
+            
+            // 파일 선택 창 라벨에 파일 이름을 표시
+            var fileLabel = document.getElementById('file-label');
+            fileLabel.textContent = fileName;
+        }
+
+        // 업로드 성공 시 서버에서 받은 파일 이름을 업데이트
+        {% if uploaded_filename %}
+            var uploadedFileName = "{{ uploaded_filename }}";
+            var fileLabel = document.getElementById('file-label');
+            fileLabel.textContent = uploadedFileName;
+        {% endif %}
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+</body>
+
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Font online-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <!-- Animate.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    <!-- JavaScript 파일을 연결합니다 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+    <title>Sign Up Page</title>
+</head>
+
+<body>
+    
+    <div>
+        <div class="panel shadow1">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            
+            <form class="signup-form" method="POST" action="{{ url_for('signup') }}">
+                <div class="panel-switch animated fadeIn">
+                    <button type="button" id="log_in" class="active-button" onclick="redirectToLogin()">Log in</button>
+                    <button type="button" id="sign_up" class="" disabled>Sign Up</button>
+                </div>
+                <h1 class="animated fadeInUp animate1" id="title-signup">welcome !</h1>
+
+                <fieldset id="signup-fieldset">
+                    <input class="signup animated fadeInUp animate2" name="ID" type="textbox" required placeholder="ID" value="">
+                    <span id="idError" style="color: red;"></span>
+                    <input class="signup animated fadeInUp animate3" name="Password" type="password" placeholder="Choose password" required value="">
+                    <input class="signup animated fadeInUp animate4" name="Email" type="email" placeholder="Email address" required value="">
+                    <span id="emailError" style="color: red;"></span>
+                    <input class="signup animated fadeInUp animate5" name="Nickname" type="textbox" required placeholder="Nickname" value="">
+                    <input class="signup animated fadeInUp animate6" name="Phone" type="tel" placeholder="Phone number" required value="">
+                </fieldset>
+                <input type="submit" id="signup-form-submit" class="signup_form button animated fadeInUp animate4" value="Sign up">
+            </form>   
+        </div>
+
+       
+    </div>
+
+    <script>
+        function redirectToLogin() {
+            window.location.href = '/login';
+        }
+    
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+
+    
+</body>
+
+</html>

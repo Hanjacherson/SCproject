@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Font online-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <!-- Animate.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <!-- JavaScript 파일을 연결합니다 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <title>Login Page</title>
+</head>
+
+<body>
+    <div>
+        <div class="panel shadow1">
+            {% with messages = get_flashed_messages() %}
+                {% if signup_success_message %}
+                    <div class="alert alert-success">
+                        {{ signup_success_message }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form class="login-form" method="POST" action="{{ url_for('login') }}">
+                <div class="panel-switch animated fadeIn">
+                    <button type="button" id="sign_up" class="active-button" onclick="redirectToSignup()">Sign Up</button>
+                    <button type="button" id="log_in" class="" disabled>Log in</button>
+                </div>
+                <h1 class="animated fadeInUp animate1" id="title-login">Welcome back !</h1>
+
+                <fieldset id="login-fieldset">
+                    <input class="login animated fadeInUp animate2" name="ID" type="textbox" required placeholder="ID" value="">
+                    <input class="login animated fadeInUp animate3" name="Password" type="password" required placeholder="Password" value="">
+                </fieldset>
+                <input type="submit" id="login-form-submit" class="login_form button animated fadeInUp animate4" value="Log in">
+                <p><a id="lost-password-link" href="" class="animated fadeIn animate5">I forgot my login or password (!)</a></p>
+                
+                
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function redirectToSignup() {
+            window.location.href = '/signup';
+        }
+    </script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+
+</body>
+
+</html>
+
