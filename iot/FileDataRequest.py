@@ -9,20 +9,45 @@ import tflite_runtime.interpreter as tflite
 import wave
 import json
 import pymysql as ps
+import socket
 
-mysql = ps.connect(host="project-db-stu3.smhrd.com", 
-                       db="Insa4_IOTB_final_4", 
-                       user="Insa4_IOTB_final_4", 
-                       password="aischool4", 
-                       port=3307,
-                       cursorclass=ps.cursors.DictCursor)
+def wait_for_network(host="8.8.8.8", port=53, timeout=10):
+    for i in range(timeout):
+        try:
+            socket.create_connection((host, port), 2)
+            return True
+        except OSError:
+            time.sleep(1)
+    return False
+
+# 네트워크 대기
+if not wait_for_network():
+    exit(1)
+
+# 환경 변수 설정 
+os.environ['DB_HOST'] = 'project-db-stu3.smhrd.com'
+os.environ['DB_NAME'] = 'Insa4_IOTB_final_4'
+os.environ['DB_USER'] = 'Insa4_IOTB_final_4'
+os.environ['DB_PASSWORD'] = 'aischool4'
+os.environ['DB_PORT'] = '3307'
+os.environ['SERVER_URL'] = 'http://192.168.20.99:5000/data'
+
+# 이후 코드에서 환경 변수 사용
+db_host = os.environ.get('DB_HOST')
+db_name = os.environ.get('DB_NAME')
+db_user = os.environ.get('DB_USER')
+db_password = os.environ.get('DB_PASSWORD')
+db_port = int(os.environ.get('DB_PORT'))
+server_url = os.environ.get('SERVER_URL')
+
+# 데이터베이스 연결
+mysql = ps.connect(host=db_host, db=db_name, user=db_user, password=db_password, port=db_port)
 
 # spidev 설정 및 아날로그 읽기 함수
 spi = spidev.SpiDev()
 spi.open(0,0)
 spi.max_speed_hz = 1000000
 
-file_path = 'data.txt'
 file_counter = 0  # 파일 이름에 사용될 카운터
 
 def DQL(sql, params=None):
@@ -114,25 +139,21 @@ def send_json_to_server(url, data, wav_file, inf_idx):
         print(f"An error occurred: {e}")
 
 def periodic_task(duration, wav_file_path, sample_rate, server_url):
+    file_path = '/home/pi/Desktop/TEST/data.txt'
     while True:
         if not os.path.exists(file_path):
             with open(file_path, 'w') as file:
-                file.write(DQL("select count(*) from t_pet"))
-                print("Make File")
+                file.write(str(DQL("select count(*) from t_pet")[0][0]))
         with open(file_path, 'r') as file:
             inf_idx = file.read()
-        print("Read File")
         
         # 파일 생성
         wav_file = collect_audio_data(duration, sample_rate, wav_file_path, inf_idx)
-        print("Make wav File")
         # 파일 로드
         audio_data, sr = load_audio_data(wav_file, sample_rate)
-        print("Read wav File")
         # 오디오 데이터가 유효한 경우에만 처리
         if audio_data is not None:
             result = process_audio_data(audio_data, sr)
-            print("process_audio_data pass")
             send_json_to_server(server_url, result, wav_file, inf_idx)
 
         time.sleep(60)  # 60초 간격으로 반복
@@ -141,7 +162,7 @@ def main():
     wav_file_path = 'Sound.wav'  # .wav 파일 경로
     sample_rate = 22050  # 샘플링 레이트
     duration = 4 # 재생 시간
-    server_url = 'http://192.168.0.12:5000/data'  # 업로드할 서버 URL
+    # server_url = 'http://192.168.20.99:5000/data'  # 업로드할 서버 URL
 
     thread = threading.Thread(target=periodic_task, args=(duration, wav_file_path, sample_rate, server_url))
     thread.daemon = True
