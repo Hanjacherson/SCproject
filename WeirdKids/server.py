@@ -4,6 +4,7 @@ import pymysql
 import requests
 import logging
 from http import HTTPStatus
+import socket
 
 mysql = pymysql.connect(host="project-db-stu3.smhrd.com", 
                        db="Insa4_IOTB_final_4", 
@@ -14,6 +15,12 @@ mysql = pymysql.connect(host="project-db-stu3.smhrd.com",
 
 app = Flask(__name__)
 app.secret_key = "12345"
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+hostname = s.getsockname()[0]
+
+
 
 # IFTTT 웹훅 URL
 ifttt_webhook_url = 'https://maker.ifttt.com/trigger/dog_check_please/with/key/d4BLCPHNfnxfSnep3Vl4dw'
@@ -38,6 +45,9 @@ def DML(sql, params=None):
     mysql.commit()
     cursor.close()
     return "success!!"
+
+print(hostname)
+DML("update t_ip set ip_val=%s", hostname)
 
 @app.route('/home/', methods=['GET', 'POST'])
 def home():
@@ -285,6 +295,7 @@ def termsofuse():
 def receive_data():
     #data = request.json
     data = request.get_json()
+    print(data)
     if data is None:
         data = json.loads(request.data.decode('utf-8'))
     # 값이 2 이상인 경우에만 IFTTT로 알림 보내기
