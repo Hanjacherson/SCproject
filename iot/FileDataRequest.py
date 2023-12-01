@@ -46,8 +46,6 @@ spi = spidev.SpiDev()
 spi.open(0,0)
 spi.max_speed_hz = 1000000
 
-file_counter = 0  # 파일 이름에 사용될 카운터
-
 def DQL(sql, params=None):
     cursor = mysql.cursor()
     cursor.execute(sql, params)
@@ -72,8 +70,11 @@ def analog_read(portChannel):
 
 # 오디오 데이터 수집 및 .wav 파일 저장 함수
 def collect_audio_data(duration, sample_rate, base_file_path, inf_idx):
-    global file_counter
-    file_counter += 1
+
+    file_counter = 1
+    num = DQL("select voice_idx from t_voice where pet_idx = %s order by voice_idx desc",(inf_idx))
+    if num[0][0] > 1:
+        file_counter = num[0][0] + 1
     output_file_path = f"{base_file_path}_{file_counter}.wav"
 
     num_samples = duration * sample_rate
@@ -87,7 +88,7 @@ def collect_audio_data(duration, sample_rate, base_file_path, inf_idx):
     
     audio_array = np.array(audio_data, dtype=np.int16)
 
-    with wave.open(output_file_path, 'w') as output_file:
+    with wave.open("/home/pi/Desktop/TEST/soundFile/"+output_file_path, 'w') as output_file:
         output_file.setnchannels(1)
         output_file.setsampwidth(2)
         output_file.setframerate(sample_rate)
@@ -98,19 +99,17 @@ def collect_audio_data(duration, sample_rate, base_file_path, inf_idx):
 
 # .wav 파일에서 오디오 데이터 로드 함수
 def load_audio_data(wav_file_path, sample_rate):
-    if not os.path.exists(wav_file_path):
+    if not os.path.exists("/home/pi/Desktop/TEST/soundFile/"+wav_file_path):
         print(f"File not found: {wav_file_path}")
         return None, None
 
-    audio, sr = librosa.load(wav_file_path, sr=sample_rate)
+    audio, sr = librosa.load("/home/pi/Desktop/TEST/soundFile/"+wav_file_path, sr=sample_rate)
     return audio, sr
 
 def process_audio_data(audio_data, sample_rate):
     # TensorFlow Lite 모델 로드 및 텐서 할당
     interpreter = tflite.Interpreter(model_path="/home/pi/Desktop/TEST/model.tflite")
     interpreter.allocate_tensors()
-
-    # 오디오 데이터 전처리 (여기서는 추가 전처리가 필요한 경우 추가)
 
     # 입력 텐서 설정 및 모델 실행
     input_details = interpreter.get_input_details()
@@ -163,7 +162,6 @@ def main():
     wav_file_path = 'Sound.wav'  # .wav 파일 경로
     sample_rate = 22050  # 샘플링 레이트
     duration = 4 # 재생 시간
-    # server_url = 'http://192.168.20.99:5000/data'  # 업로드할 서버 URL
 
     thread = threading.Thread(target=periodic_task, args=(duration, wav_file_path, sample_rate, server_url))
     thread.daemon = True
