@@ -322,16 +322,17 @@ def receive_data():
                 # 연결 종료
                 connection.close()
 
-            send_notification()
+            send_notification(data['voice_idx'])
             return {'success':'Notification sent'}
         except Exception as e:
                 return {'fail': f'오류: {e}'}
     else:
         return {'fail':'Notification no sent'}
 
-def send_notification():
+def send_notification(voice_idx):
+    pet_name = DQL("select pet_name from t_pet where pet_idx = (select pet_idx from t_voice where voice_idx=%s)", (voice_idx))
     # IFTTT로 POST 요청 보내기
-    data1 = {'value': '노드조'}
+    data1 = {pet_name: 'whining'}
     try:
         response = requests.post(ifttt_webhook_url, json=data1)
         response.raise_for_status()  # 나쁜 응답에 대해 HTTPError 발생

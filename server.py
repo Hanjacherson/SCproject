@@ -48,11 +48,36 @@ def home():
 
     user_id = session['login_user']
 
-   # 펫 정보 및 보호자 닉네임 가져오기
+    # 펫 정보 및 보호자 닉네임 가져오기
     pet_info, guardian_nickname = get_pet_and_guardian_info(user_id)
-    
-    return render_template('home.html', error=error, user_id=user_id, pet_info=pet_info, guardian_nickname=guardian_nickname)
 
+    # Connect to MySQL
+    mysql = pymysql.connect(
+        host="project-db-stu3.smhrd.com",
+        db="Insa4_IOTB_final_4",
+        user="Insa4_IOTB_final_4",
+        password="aischool4",
+        port=3307,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+    # Create a cursor object
+    cursor = mysql.cursor()
+
+    # Execute your SQL query
+    cursor.execute("SELECT pet_idx, t_voice.result_at, "
+                   "CASE WHEN t_voice.voice_result = 0 THEN 'Barking' ELSE 'Whimpping' END AS voice_result "
+                   "FROM t_voice")
+
+    # Fetch all the results
+    results = cursor.fetchall()
+
+    # Close the cursor and connection
+    cursor.close()
+    mysql.close()
+
+    # Pass the data to the template
+    return render_template('home.html', error=error, user_id=user_id, pet_info=pet_info, guardian_nickname=guardian_nickname, results=results)
 
 def get_pet_and_guardian_info(user_id):
     # 가상의 코드: 사용자의 강아지 정보와 보호자 닉네임을 데이터베이스에서 가져온다고 가정
@@ -81,18 +106,7 @@ def get_pet_and_guardian_info(user_id):
     return pet_info, guardian_nickname
 
 
-def get_pet_info(user_id):
-    # 가상의 코드: 사용자의 강아지 정보를 데이터베이스에서 가져온다고 가정
-    sql = "SELECT pet_idx, pet_name, created_at FROM t_pet JOIN t_member USING (id) WHERE t_pet.id = %s"
-    result = DQL(sql, (user_id,))
 
-    # 결과가 있다면 첫 번째 행을 사용
-    if result:
-        pet_info = result[0]
-        return pet_info
-
-    # 결과가 없다면 None 반환
-    return None
 
 
 @app.route('/update_pet_info', methods=['POST'])
@@ -232,7 +246,7 @@ def profile():
     user_info = user_info[0]  # 결과가 리스트 형태이므로 첫 번째 요소를 사용
 
     # 펫 정보를 가져옵니다.
-    pet_info = get_pet_info(user_id)
+    pet_info = pet_info[0]
 
     return render_template('profile.html', user_id=user_info['id'], email=user_info['email'],
                            nickname=user_info['nick'], phone=user_info['phone'],  pet_info=pet_info)
@@ -281,12 +295,12 @@ def policy():
 def termsofuse():
     return render_template('termsofuse.html')
 
-@app.route('/data', methods=['GET','POST'])
-def receive_data():
-    #data = request.json
-    data = request.get_json()
-    if data is None:
-        data = json.loads(request.data.decode('utf-8'))
+# @app.route('/data', methods=['GET','POST'])
+# def receive_data():
+#     #data = request.json
+#     data = request.get_json()
+#     if data is None:
+#         data = json.loads(request.data.decode('utf-8'))
     # 값이 2 이상인 경우에만 IFTTT로 알림 보내기
     if isinstance(data, dict) and 'value' in data and data['value'] > 0:
         try:
@@ -300,10 +314,10 @@ def receive_data():
             with connection:
                 with connection.cursor() as cursor:
                     # SQL 업데이트 쿼리
-                    query = "UPDATE t_voice SET voice_result = %s WHERE voice_idx = %s"
+                    query = "UPDATE t_voice SET voice_result = 1 WHERE voice_idx = %s"
                     
                     # SQL 명령 실행
-                    cursor.execute(query, (data['value'], data['voice_idx']))
+                    cursor.execute(query, (data['voice_idx']))
                     
                     # 변경 사항 커밋
                     connection.commit()
@@ -311,16 +325,17 @@ def receive_data():
                 # 연결 종료
                 connection.close()
 
-            send_notification()
+            send_notification(data['voice_idx'])
             return {'success':'Notification sent'}
         except Exception as e:
                 return {'fail': f'오류: {e}'}
     else:
         return {'fail':'Notification no sent'}
 
-def send_notification():
+def send_notification(voice_idx):
+    pet_name = DQL("select pet_name from t_pet where pet_idx = (select pet_idx from t_voice where voice_idx=%s)", (voice_idx))
     # IFTTT로 POST 요청 보내기
-    data1 = {'value': '노드조'}
+    data1 = {pet_name: 'whining'}
     try:
         response = requests.post(ifttt_webhook_url, json=data1)
         response.raise_for_status()  # 나쁜 응답에 대해 HTTPError 발생
@@ -330,55 +345,5 @@ def send_notification():
     except requests.exceptions.RequestException as err:
         logger.error(f"요청 예외: {err}")
 
-cursor = mysql.cursor()
-@app.route("/")
-def index():
-    # 예제 쿼리: pet_idx가 1이고 voice_result가 'A' 또는 'B'인 데이터 가져오기
-    query = "SELECT * FROM t_voice WHERE pet_idx = 1 AND voice_result IN ('A', 'B')"
-    cursor.execute(query)
-    result = cursor.fetchone()
-
-    if result:
-        # 예제 쿼리: voice_result 값에 따라 voice_data 업데이트
-        update_query = """
-        UPDATE t_voice
-        SET 
-            voice_data = CASE 
-                            WHEN voice_result = 'A' THEN '정임이 천재' 
-                            WHEN voice_result = 'B' THEN '정임이 바보' 
-                        END,
-            result_at = CONVERT_TZ(NOW(), 'UTC', 'Asia/Seoul')
-        WHERE voice_idx = %s
-        """
-        cursor.execute(update_query, (result[0],))  # result[0]은 voice_idx
-
-        # 업데이트된 데이터를 HTML 파일에 전달
-        return render_template("home.html", voice_data=result[2])
-    else:
-        return "No data found."
-cursor = mysql.cursor()
-
-@app.route("/")
-def index():
-    # MySQL 쿼리 실행
-    query = """
-    SELECT DATE(result_at) AS date, COUNT(*) AS count
-    FROM t_voice
-    GROUP BY DATE(result_at)
-    """
-    cursor.execute(query)
-    results = cursor.fetchall()
-
-    # 결과를 JSON 형식으로 반환
-    return jsonify(results)
-
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
-
-
-
-
-
-
-
