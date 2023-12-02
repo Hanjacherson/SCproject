@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import librosa
+import soundfile as sf
 import requests
 import threading
 import time
@@ -60,9 +60,6 @@ def DML(sql, params=None):
     cursor.close()
     return "success!!"
 
-os.environ['SERVER_URL'] = 'http://'+str(DQL("select ip_val from t_ip where ad_idx=%s",1)[0][0])+':5000/data'
-server_url = os.environ.get('SERVER_URL')
-
 def analog_read(portChannel):
     adc = spi.xfer2([1, (8+portChannel)<<4, 0])
     data = ((adc[1]&3)<<8)+adc[2]
@@ -103,7 +100,7 @@ def load_audio_data(wav_file_path, sample_rate):
         print(f"File not found: {wav_file_path}")
         return None, None
 
-    audio, sr = librosa.load("/home/pi/Desktop/TEST/soundFile/"+wav_file_path, sr=sample_rate)
+    audio, sr = sf.read("/home/pi/Desktop/TEST/soundFile/"+wav_file_path)
     return audio, sr
 
 def process_audio_data(audio_data, sample_rate):
@@ -115,6 +112,9 @@ def process_audio_data(audio_data, sample_rate):
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     input_shape = input_details[0]['shape']
+    
+    # 오디오 데이터 타입을 float32로 변환
+    audio_data = audio_data.astype(np.float32)
 
     # 오디오 데이터 형태 변환
     test = np.expand_dims(audio_data, axis=0)
@@ -157,12 +157,18 @@ def periodic_task(duration, wav_file_path, sample_rate, server_url):
             send_json_to_server(server_url, result, wav_file, inf_idx)
 
         time.sleep(60)  # 60초 간격으로 반복
-
+def server_location():
+    try:
+        return 'http://'+str(DQL("select ip_val from t_ip where ad_idx=%s",1)[0][0])+':5000/data'
+    except e:
+        print(e)
+    return 'http://192.168.20.99:5000/data'
+    
 def main():
     wav_file_path = 'Sound.wav'  # .wav 파일 경로
     sample_rate = 22050  # 샘플링 레이트
     duration = 4 # 재생 시간
-
+    server_url = server_location()
     thread = threading.Thread(target=periodic_task, args=(duration, wav_file_path, sample_rate, server_url))
     thread.daemon = True
     thread.start()
