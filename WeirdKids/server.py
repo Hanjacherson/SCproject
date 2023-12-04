@@ -247,7 +247,7 @@ def profile():
     return render_template('profile.html', user_id=user_info['id'], email=user_info['email'],
                            nickname=user_info['nick'], phone=user_info['phone'],  pet_info=pet_info)
 
-from flask import flash
+# from flask import flash
 
 
 @app.route('/update_profile', methods=['POST'])
@@ -295,11 +295,10 @@ def termsofuse():
 def receive_data():
     #data = request.json
     data = request.get_json()
-    print(data)
     if data is None:
         data = json.loads(request.data.decode('utf-8'))
-    # 값이 2 이상인 경우에만 IFTTT로 알림 보내기 isinstance(data, dict) and 'value' in data and data['value'] > 0
-    if isinstance(data, dict) and 'value' in data and data['value'] > 0:
+    #if 1:
+    if isinstance(data, dict) and 'value' in data and data['value'] > 0.3:
         try:
             DML("UPDATE t_voice SET voice_result = 1 WHERE voice_idx = %s", (data['voice_idx']))
             send_notification(data['voice_idx'])
@@ -312,7 +311,7 @@ def receive_data():
 def send_notification(voice_idx):
     pet_name = DQL("select pet_name from t_pet where pet_idx = (select pet_idx from t_voice where voice_idx=%s)", (voice_idx))
     # IFTTT로 POST 요청 보내기
-    data1 = {'value1': pet_name}
+    data1 = {'value1': '두들이'}
     try:
         response = requests.post(ifttt_webhook_url, json=data1)
         response.raise_for_status()  # 나쁜 응답에 대해 HTTPError 발생
